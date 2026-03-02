@@ -3,7 +3,7 @@ from typing import Any
 
 class AbstractConfig(ABC):
     @abstractmethod
-    def __init__(self, category: str):
+    def __init__(self, category: str, file_path: str):
         pass
 
     @abstractmethod

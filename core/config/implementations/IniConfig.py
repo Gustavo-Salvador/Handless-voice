@@ -6,8 +6,8 @@ from core.config.register_config import register_config
 
 @register_config('ini')
 class IniConfig(AbstractConfig):
-    def __init__(self, category: str):
-        self.file_path = './config.ini'
+    def __init__(self, category: str, file_path: str = './config.ini'):
+        self.file_path = file_path
         self.category = category
         self.config_parser = ConfigParser()
         self.config_parser.read(self.file_path)
