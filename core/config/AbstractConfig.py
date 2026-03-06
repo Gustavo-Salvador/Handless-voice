@@ -1,9 +1,30 @@
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, Type
+
+from pydantic import BaseModel
 
 class AbstractConfig(ABC):
+    @property
     @abstractmethod
-    def __init__(self, category: str, file_path: str):
+    def file_path(self) -> str:
+        pass
+
+    @property
+    @abstractmethod
+    def category(self) -> str:
+        pass
+
+    @property
+    @abstractmethod
+    def pydantic_model(self) -> Type[BaseModel]:
+        pass
+
+    @abstractmethod
+    def __init__(self, category: str, pydantic_model: Type[BaseModel], file_path: str):
+        pass
+
+    @abstractmethod
+    def to_pydantic(self) -> BaseModel:
         pass
 
     @abstractmethod

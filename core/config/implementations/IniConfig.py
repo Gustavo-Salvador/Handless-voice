@@ -1,20 +1,36 @@
-from typing import Any
+from typing import Any, Type
 from configparser import ConfigParser
+
+from pydantic import BaseModel
 
 from core.config.AbstractConfig import AbstractConfig
 from core.config.register_config import register_config
 
 @register_config('ini')
 class IniConfig(AbstractConfig):
-    def __init__(self, category: str, file_path: str = './config.ini'):
-        self.file_path = file_path
-        self.category = category
+    @property
+    def file_path(self):
+        return self._file_path
+
+    @property
+    def category(self) -> str:
+        return self._category
+    
+    @property
+    def pydantic_model(self) -> Type[BaseModel]:
+        return self._base_model
+
+    def __init__(self, category: str, pydantic_model: Type[BaseModel], path: str = './config.ini'):
+        self._file_path = path
+        self._category = category
+        self._base_model = pydantic_model
+
         self.config_parser = ConfigParser()
-        self.config_parser.read(self.file_path)
+        self.config_parser.read(self._file_path)
 
         if not self.config_parser.has_section(category):
             self.config_parser.add_section(category)
-            with open(self.file_path, 'w') as configfile:
+            with open(self._file_path, 'w') as configfile:
                 self.config_parser.write(configfile)
 
         self.config = self.config_parser[category]
@@ -25,8 +41,10 @@ class IniConfig(AbstractConfig):
         return None
 
     def set_config(self, name: str, value: Any) -> None:      
-        self.config_parser[self.category][name] = value
+        self.config_parser[self._category][name] = value
                 
-        with open(self.file_path, 'w') as configfile:
+        with open(self._file_path, 'w') as configfile:
             self.config_parser.write(configfile)
             
+    def to_pydantic(self) -> BaseModel:
+        return self._base_model.model_validate(self.config)
