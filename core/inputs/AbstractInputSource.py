@@ -14,5 +14,9 @@ class AbstractInputSource(ABC):
         pass
     
     @abstractmethod
+    def import_dependencies(self) -> None:
+        pass
+
+    @abstractmethod
     def generate_file(self) -> Path:
         pass
