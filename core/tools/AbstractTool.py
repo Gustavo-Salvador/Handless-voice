@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from core.models.tools.ParameterDescriptions import ParameterDescriptions
 
-class AbstractAction(ABC):
+class AbstractTool(ABC):
     @property
     @abstractmethod
     def description(self) -> str:
