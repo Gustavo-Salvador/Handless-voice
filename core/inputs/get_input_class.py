@@ -3,13 +3,14 @@ from typing import Type
 from core.inputs.AbstractInputSource import AbstractInputSource
 from core.inputs.register_input import inputs
 
-def get_input_class(conf_name: str) -> Type[AbstractInputSource]:
-    key = conf_name.lower()
+def get_input_class(input_name: str) -> Type[AbstractInputSource]:
+    key = input_name.lower()
     
     if key not in inputs:
+        import core.inputs.implementation
         raise ValueError(
-            f"Configuration '{key}' not found. "
-            f"Available configs: {list(inputs.keys())}"
+            f"Input '{key}' not found. "
+            f"Available inputs: {list(inputs.keys())}"
         )
         
     return inputs[key]
