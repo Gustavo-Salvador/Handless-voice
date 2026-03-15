@@ -20,8 +20,8 @@ class IniConfig(AbstractConfig):
     def pydantic_model(self) -> Type[BaseModel]:
         return self._base_model
 
-    def __init__(self, category: str, pydantic_model: Type[BaseModel], path: str = './config.ini'):
-        self._file_path = path
+    def __init__(self, category: str, pydantic_model: Type[BaseModel], file_path: str = './config.ini'):
+        self._file_path = file_path
         self._category = category
         self._base_model = pydantic_model
 
