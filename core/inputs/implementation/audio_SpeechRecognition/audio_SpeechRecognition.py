@@ -1,0 +1,70 @@
+import os
+from typing import Callable, Type
+from pathlib import Path
+
+from datetime import datetime
+
+import speech_recognition as sr
+
+from core.inputs.implementation.audio_SpeechRecognition.config_pydantic import AudioSpeechRecognitionConfig
+from core.inputs.implementation.audio_SpeechRecognition.functions.record_audio import record_audio
+from core.inputs.implementation.audio_SpeechRecognition.functions.save_wave_file import save_wav_file
+from core.inputs.register_input import register_input
+from core.inputs.implementation.audio_SpeechRecognition.imports import imports
+from core.config.AbstractConfig import AbstractConfig
+from core.inputs.AbstractInputSource import AbstractInputSource
+
+@register_input("audio")
+class audio_SpeechRecognition(AbstractInputSource):
+    def __init__(self, get_config_class: Callable[[str], Type[AbstractConfig]], output_folder: str) -> None:
+        
+        self.get_config = get_config_class
+        self.dir = Path(__file__).parent.resolve()
+        self.config_path = os.path.join(self.dir, 'config.ini')
+        self._config_source = get_config_class('ini')(category='AUDIO', pydantic_model=AudioSpeechRecognitionConfig, file_path=self.config_path)
+
+        self.import_dependencies()
+
+        self.recognizer = sr.Recognizer()
+        self.microphone_index = int(self.config_source.get_config('microphone'))
+        self.microphone = sr.Microphone(device_index=self.microphone_index)
+
+        self.calibrate_microphone()
+
+        self.output_folder = output_folder
+
+    @property
+    def config_source(self) -> AbstractConfig:
+        return self._config_source
+
+    def import_dependencies(self) -> None:
+        imports()
+
+    def calibrate_microphone(self) -> None:
+        print("Calibrando o ruído ambiente... Aguarde um segundo.")
+
+        r = self.recognizer
+
+        calib_duration = float(self.config_source.get_config('calib_duration'))
+
+        with self.microphone as source:
+            r.adjust_for_ambient_noise(source, duration=calib_duration)
+
+        print("Calibração concluída.")
+
+    def generate_file_name(self) -> str:
+        return f"{self.output_folder}/{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.wav"
+
+    def generate_file(self) -> Path:
+
+        pause_threshold = float(self.config_source.get_config('pause_threshold'))
+
+        r = self.recognizer
+
+        file_name = self.generate_file_name()
+
+        audio_bytes = record_audio(r, self.microphone, pause_threshold)
+
+        file_path = save_wav_file(file_name, audio_bytes)
+
+        return file_path
