@@ -7,7 +7,6 @@ def get_input_class(input_name: str) -> Type[AbstractInputSource]:
     key = input_name.lower()
     
     if key not in inputs:
-        import core.inputs.implementation
         raise ValueError(
             f"Input '{key}' not found. "
             f"Available inputs: {list(inputs.keys())}"
