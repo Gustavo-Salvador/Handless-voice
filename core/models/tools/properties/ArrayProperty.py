@@ -1,10 +1,10 @@
-from typing import TypeVar
+from typing import Type, TypeVar
 
 from core.models.tools.properties.BasicProperty import BasicProperty
 
 TItem = TypeVar("TItem")
 
 class ArrayProperty(BasicProperty[list[TItem]]):
-    type: list[TItem]
+    type: Type[list[TItem]] = list
     description: str
     items: TItem
