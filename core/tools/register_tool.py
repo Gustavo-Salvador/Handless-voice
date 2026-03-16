@@ -1,10 +1,10 @@
-from typing import Callable, Type, TypeVar, Dict
+from typing import Callable, Type, TypeVar, Dict, Any
 
 from core.tools.AbstractTool import AbstractTool
 
-TTool = TypeVar("TTool", bound=AbstractTool)
+TTool = TypeVar("TTool", bound=AbstractTool[Any])
 
-tool: Dict[str, Type[AbstractTool]] = {}
+tool: Dict[str, Type[AbstractTool[Any]]] = {}
 
 def register_tool(tool_name: str) -> Callable[[Type[TTool]], Type[TTool]]:
     def decorator(tool_class: Type[TTool]) -> Type[TTool]:
