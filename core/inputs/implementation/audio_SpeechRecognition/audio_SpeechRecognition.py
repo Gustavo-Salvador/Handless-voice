@@ -1,18 +1,29 @@
 import os
+import sys
 from typing import Callable, Type
 from pathlib import Path
 
 from datetime import datetime
 
-import speech_recognition as sr
-
 from core.inputs.implementation.audio_SpeechRecognition.config_pydantic import AudioSpeechRecognitionConfig
 from core.inputs.implementation.audio_SpeechRecognition.functions.record_audio import record_audio
 from core.inputs.implementation.audio_SpeechRecognition.functions.save_wave_file import save_wav_file
 from core.inputs.register_input import register_input
-from core.inputs.implementation.audio_SpeechRecognition.imports import imports
 from core.config.AbstractConfig import AbstractConfig
 from core.inputs.AbstractInputSource import AbstractInputSource
+
+try:
+    import pyaudio # type: ignore
+    import speech_recognition as sr # type: ignore
+
+except ImportError:
+    # Informa o usuário sobre a falta de bibliotecas
+    print("\033[91mErro:\033[0m Algumas bibliotecas não estão instaladas, tentando instalar.")
+    os.system(f"{sys.executable} -m pip install SpeechRecognition pyaudio")
+    print("Bibliotecas instaladas com sucesso.")
+
+    import pyaudio # type: ignore
+    import speech_recognition as sr # type: ignore
 
 @register_input("audio")
 class audio_SpeechRecognition(AbstractInputSource):
@@ -22,8 +33,6 @@ class audio_SpeechRecognition(AbstractInputSource):
         self.dir = Path(__file__).parent.resolve()
         self.config_path = os.path.join(self.dir, 'config.ini')
         self._config_source = get_config_class('ini')(category='AUDIO', pydantic_model=AudioSpeechRecognitionConfig, file_path=self.config_path)
-
-        self.import_dependencies()
 
         self.recognizer = sr.Recognizer()
         self.microphone_index = int(self.config_source.get_config('microphone'))
@@ -36,9 +45,6 @@ class audio_SpeechRecognition(AbstractInputSource):
     @property
     def config_source(self) -> AbstractConfig:
         return self._config_source
-
-    def import_dependencies(self) -> None:
-        imports()
 
     def calibrate_microphone(self) -> None:
         print("Calibrando o ruído ambiente... Aguarde um segundo.")
