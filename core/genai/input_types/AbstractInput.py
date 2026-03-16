@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Any, Callable, Concatenate, Generic, ParamSpec, TypeVar
 
 retorno_processamento = TypeVar("retorno_processamento")
-P = ParamSpec("P") # Catches the remaining arbitrary parameters
+P = ParamSpec("P")
 
 class AbstractInput(ABC, Generic[P]):
     @abstractmethod
