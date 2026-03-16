@@ -5,6 +5,6 @@ from core.models.tools.properties.BasicProperty import BasicProperty
 TItem = TypeVar("TItem")
 
 class ArrayProperty(BasicProperty[list[TItem]]):
-    type: Type[list[TItem]] = list
+    prop_type: Type[list[TItem]] | None = list
     description: str
     items: TItem
