@@ -1,10 +1,16 @@
 from abc import ABC, abstractmethod
-from typing import Generic, ParamSpec
-from core.models.tools.ParameterDescriptions import ParameterDescriptions
+from typing import Generic, ParamSpec, TypeVar
+
+from pydantic import BaseModel
 
 P = ParamSpec("P")
+R = TypeVar("R")
 
-class AbstractTool(ABC, Generic[P]):
+class AbstractTool(ABC, Generic[P, R]):
+    @abstractmethod
+    def __init__(self) -> None:
+        pass
+
     @property
     @abstractmethod
     def description(self) -> str:
@@ -12,13 +18,9 @@ class AbstractTool(ABC, Generic[P]):
     
     @property
     @abstractmethod
-    def parameters(self) -> ParameterDescriptions:
+    def parameters(self) -> type[BaseModel] | None:
         pass
 
     @abstractmethod
-    def __init__(self) -> None:
-        pass
-
-    @abstractmethod
-    def execute(self, *args: P.args, **kwargs: P.kwargs) -> None:
+    def execute(self, *args: P.args, **kwargs: P.kwargs) -> R:
         pass

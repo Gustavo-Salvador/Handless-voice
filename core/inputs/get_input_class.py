@@ -2,6 +2,7 @@ from typing import Type
 
 from core.inputs.AbstractInputSource import AbstractInputSource
 from core.inputs.register_input import inputs
+import core.inputs.implementation # type: ignore
 
 def get_input_class(input_name: str) -> Type[AbstractInputSource]:
     key = input_name.lower()

@@ -1,10 +1,11 @@
 from pathlib import Path
 from typing import Any
 from core.functions.read_file_to_bytes import read_file_to_bytes
+from core.functions.separate_mimetype import separate_mimetype
 from core.genai.input_types.AbstractInput import AbstractInput
-from core.genai.input_types.mimetype_mapper import mimetype_mapper
+from .get_input_type import get_input_type
 
-def transform_to_input(data: Any) -> AbstractInput[[str]] | None:
+def transform_to_input(data: Any, message: str | None = None) -> AbstractInput[[str]] | None:
     prompt_tuple: tuple[str, bytes] | None = None
     input_data: AbstractInput[[str]] | None = None
 
@@ -30,7 +31,9 @@ def transform_to_input(data: Any) -> AbstractInput[[str]] | None:
     if prompt_tuple is None:
         return None
         
-    input_data = mimetype_mapper(prompt_tuple[0])(prompt_tuple[1], prompt_tuple[0])
+    input_type, _ = separate_mimetype(prompt_tuple[0])
+
+    input_data = get_input_type(input_type)(prompt_tuple[1], prompt_tuple[0], message)
     
     if isinstance(data, AbstractInput):
         input_data = data

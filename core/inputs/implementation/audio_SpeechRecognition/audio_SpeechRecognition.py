@@ -5,6 +5,7 @@ from pathlib import Path
 
 from datetime import datetime
 
+from core.gui.AbstractGUI import AbstractGUI
 from core.inputs.implementation.audio_SpeechRecognition.config_pydantic import AudioSpeechRecognitionConfig
 from core.inputs.implementation.audio_SpeechRecognition.functions.record_audio import record_audio
 from core.inputs.implementation.audio_SpeechRecognition.functions.save_wave_file import save_wav_file
@@ -27,9 +28,13 @@ except ImportError:
 
 @register_input("audio")
 class audio_SpeechRecognition(AbstractInputSource):
-    def __init__(self, get_config_class: Callable[[str], Type[AbstractConfig]], output_folder: str) -> None:
-        
+    def __init__(self, get_config_class: Callable[[str], Type[AbstractConfig]], output_folder: str, user_interface: AbstractGUI) -> None:
         self.get_config = get_config_class
+        self.user_interface = user_interface
+
+        self.icon = Path(r"./assets/mic_idle.png")
+        self.user_interface.set_icon(self.icon)
+        
         self.dir = Path(__file__).parent.resolve()
         self.config_path = os.path.join(self.dir, 'config.ini')
         self._config_source = get_config_class('ini')(category='AUDIO', pydantic_model=AudioSpeechRecognitionConfig, file_path=self.config_path)
@@ -53,8 +58,16 @@ class audio_SpeechRecognition(AbstractInputSource):
 
         calib_duration = float(self.config_source.get_config('calib_duration'))
 
+        old_sub_text = self.user_interface.sub_text
+
+        self.user_interface.set_main_text("Calibrando o ruído ambiente.")
+        self.user_interface.set_sub_text("é necessario silêncio.")
+
         with self.microphone as source:
             r.adjust_for_ambient_noise(source, duration=calib_duration)
+
+        self.user_interface.set_main_text("Calibração concluída!")
+        self.user_interface.set_sub_text(old_sub_text)
 
         print("Calibração concluída.")
 
@@ -69,7 +82,7 @@ class audio_SpeechRecognition(AbstractInputSource):
 
         file_name = self.generate_file_name()
 
-        audio_bytes = record_audio(r, self.microphone, pause_threshold)
+        audio_bytes = record_audio(r, self.microphone, pause_threshold, self.user_interface)
 
         file_path = save_wav_file(file_name, audio_bytes)
 

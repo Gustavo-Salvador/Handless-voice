@@ -1,19 +1,18 @@
+from typing import Any
+
 from pydantic import BaseModel
-from typing import Generic, TypeVar
 
 from core.models.SegurarançaConfigs import SegurancaConfigs
 from core.models.tipos.NivelSeguranca import NivelSeguranca
 from core.models.tipos.CategoriaSeguranca import CategoriaSeguranca
 from core.models.tipos.NivelPensamento import NivelPensamento
 
-ferramenta = TypeVar("ferramenta")
-
-class IAConfigs(BaseModel, Generic[ferramenta]):
+class IAConfigs(BaseModel):
     api_key: str
     model: str
     instrucoes_sistema: str | None = None
     mecanismo_busca: bool = False
-    ferramentas: list[ferramenta] = []
+    ferramentas: list[dict[str, Any]] = []
     manter_historico: bool = False
     nivel_pensamento: NivelPensamento = NivelPensamento.MEDIO
     verbose: bool = False
