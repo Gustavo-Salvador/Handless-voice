@@ -32,7 +32,8 @@ class audio_SpeechRecognition(AbstractInputSource):
         self.get_config = get_config_class
         self.user_interface = user_interface
 
-        self.icon = Path(r"./assets/mic_idle.png")
+        self.local_dir = Path(__file__).parent.resolve()
+        self.icon = Path(f"{self.local_dir}/assets/mic_idle.png")
         self.user_interface.set_icon(self.icon)
         
         self.dir = Path(__file__).parent.resolve()
@@ -82,7 +83,20 @@ class audio_SpeechRecognition(AbstractInputSource):
 
         file_name = self.generate_file_name()
 
-        audio_bytes = record_audio(r, self.microphone, pause_threshold, self.user_interface)
+        old_icon_path = self.user_interface.icon
+        record_icon_path = Path(f"{self.local_dir}/assets/mic_recording.png")
+
+        if record_icon_path.exists():
+            self.user_interface.set_icon(record_icon_path)
+            
+        self.user_interface.set_main_text("Gravando...")
+
+        audio_bytes = record_audio(r, self.microphone, pause_threshold)
+
+        self.user_interface.hide_question()
+        self.user_interface.set_icon(old_icon_path)
+        self.user_interface.set_main_text("Gravação finalizada!")
+
 
         file_path = save_wav_file(file_name, audio_bytes)
 

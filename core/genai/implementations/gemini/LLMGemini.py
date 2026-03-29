@@ -3,8 +3,20 @@ from typing import Any, Callable, cast
 from core.genai.AbstractGenai import AbstractGenai
 from core.genai.register_ia import register_ia
 
-from google import genai
-from google.genai.types import Content, ContentListUnionDict
+import os
+import sys
+
+try:
+    from google import genai
+    from google.genai.types import Content, ContentListUnionDict
+except ImportError:
+    print("\033[91mErro:\033[0m Algumas bibliotecas não estão instaladas, tentando instalar.")
+    os.system(f"{sys.executable} -m pip install google-generativeai")
+    print("Bibliotecas instaladas com sucesso.")
+
+    from google import genai
+    from google.genai.types import Content, ContentListUnionDict
+
 
 from core.gui.AbstractGUI import AbstractGUI
 
@@ -74,7 +86,7 @@ class LLMGemini(AbstractGenai):
                 self.user_interface.set_sub_text('Processando...')
                 self.user_interface.set_main_text('Aguarde...')
 
-                message_content_union = cast(ContentListUnionDict, self.messages)
+                message_content_union = cast("ContentListUnionDict", self.messages)
                 response = self.client.models.generate_content(
                     model=self.model,
                     contents=message_content_union, 

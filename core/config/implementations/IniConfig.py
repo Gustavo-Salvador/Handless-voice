@@ -1,5 +1,15 @@
+import os
+import sys
 from typing import Any, Type
-from configparser import ConfigParser
+
+try:
+    from configparser import ConfigParser
+    
+except ImportError:
+    print("\033[91mErro:\033[0m Algumas bibliotecas não estão instaladas, tentando instalar.")
+    os.system(f"{sys.executable} -m pip install configparser")
+    print("Bibliotecas instaladas com sucesso.")
+    from configparser import ConfigParser
 
 from pydantic import BaseModel
 
