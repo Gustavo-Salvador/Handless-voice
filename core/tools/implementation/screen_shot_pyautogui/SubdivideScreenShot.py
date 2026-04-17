@@ -26,8 +26,9 @@ class SubdivideScreenShot(AbstractTool[[int, int], Path | str]):
     def description(self) -> str:
         return (
             "Zooms into a specific grid cell (defined by x and y indexes) from the last screenshot "
-            "and subdivides it with a new grid. Use this when the target element is too small or "
-            "shares a cell with other elements. Requires 'screen_shot' to be executed first."
+            "and subdivides it with a new grid. Use increase your precision before using the 'move_mouse' tool. "
+            "if you don't see where you want to click on the subdivision use the 'clear_screenshot_history' tool and start again. "
+            "Requires 'screen_shot' to be executed first."
         )
 
     @property

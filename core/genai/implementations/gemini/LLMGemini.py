@@ -8,15 +8,17 @@ import sys
 
 try:
     from google import genai
-    from google.genai.types import Content, ContentListUnionDict
+    from google.genai.types import Content, ContentListUnionDict, HttpOptions
+    from google.genai.errors import ServerError
+
 except ImportError:
     print("\033[91mErro:\033[0m Algumas bibliotecas não estão instaladas, tentando instalar.")
     os.system(f"{sys.executable} -m pip install google-generativeai")
     print("Bibliotecas instaladas com sucesso.")
 
     from google import genai
-    from google.genai.types import Content, ContentListUnionDict
-
+    from google.genai.types import Content, ContentListUnionDict, HttpOptions
+    from google.genai.errors import ServerError
 
 from core.gui.AbstractGUI import AbstractGUI
 
@@ -35,12 +37,16 @@ class LLMGemini(AbstractGenai):
     def __init__(self, IAConfigs: IAConfigs, tool_getter: Callable[[str], type[AbstractTool[Any, Any]] | dict[str, type[AbstractTool[Any, Any]]]], user_interface: AbstractGUI):
         self.model = IAConfigs.model
         self.config = config_gemini_adaptador(IAConfigs)
-        self.client = genai.Client(api_key=IAConfigs.api_key)
+        self.api_key = IAConfigs.api_key
+        self.client = genai.Client(api_key=IAConfigs.api_key, http_options=HttpOptions(timeout=20000))
         self.tool_getter = tool_getter
         self.keep_history = IAConfigs.manter_historico
         self.user_interface = user_interface
 
         self.messages: list[Content] = []
+
+    def reset_model(self):
+        self.client = genai.Client(api_key=self.api_key, http_options=HttpOptions(timeout=20000))
     
     def enviar_prompt(self, prompt: str | tuple[str, bytes] | Path | AbstractInput[[str]], **kwargs: dict[str, Any]) -> str | None:
         input_data: AbstractInput[[str]] | None = None
@@ -51,7 +57,7 @@ class LLMGemini(AbstractGenai):
             response = self.client.models.generate_content(
                 model=self.model,
                 contents=prompt, 
-                config=self.config
+                config=self.config, 
             )
 
             response_text = response.text
@@ -82,16 +88,36 @@ class LLMGemini(AbstractGenai):
 
             response = None
             loop_execution = True
+            content_generation_tries = 0
+
             while loop_execution:
                 self.user_interface.set_sub_text('Processando...')
                 self.user_interface.set_main_text('Aguarde...')
 
                 message_content_union = cast("ContentListUnionDict", self.messages)
-                response = self.client.models.generate_content(
-                    model=self.model,
-                    contents=message_content_union, 
-                    config=self.config
-                )
+
+                while True:
+                    try:
+                        response = self.client.models.generate_content(
+                            model=self.model,
+                            contents=message_content_union, 
+                            config=self.config
+                        )
+
+                        break
+
+                    except ServerError as e:
+                        self.reset_model()
+
+                        if e.code == 504:
+
+                            print('Error: timeout')
+
+                            if content_generation_tries > 3:
+                                return None
+
+                        else:
+                            return None
 
                 self.user_interface.set_main_text('Resposta recebida!')
 

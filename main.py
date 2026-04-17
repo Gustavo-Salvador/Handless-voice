@@ -34,13 +34,13 @@ if __name__ == "__main__":
         print("\033[91mErro:\033[0m Algumas bibliotecas não estão instaladas, tentando instalar.")
         
         import os
-        if not os.path.isfile("requiriments.txt"):
+        if not os.path.isfile("requirements.txt"):
             # Erro: Printar em vermelho
-            print("\033[91mArquivo 'requiriments.txt' não encontrado.\033[0m")
+            print("\033[91mArquivo 'requirements.txt' não encontrado.\033[0m")
             print('Favor reinstalar o programa no github "https://github.com/Gustavo-Salvador/Handless-voice"')
             sys.exit(1)
 
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", "requiriments.txt"])
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
         print("Bibliotecas instaladas com sucesso.")
 
     config = get_config_class('ini')('GENERAL', MainConfig, './configs/main_config.ini')
@@ -50,7 +50,7 @@ if __name__ == "__main__":
     api_key = config.get_config('api_key')
     ia_type = config.get_config('ia_type')
     ia_model = config.get_config('ia_model')
-    input_type = config.get_config('input_type')
+    input_type = config.get_config('input_source_type')
     gui_type = config.get_config('gui_type')
 
     ia_config = IAConfigs(

@@ -25,7 +25,7 @@ def run_gui_process(cmd_queue: mp.Queue[tuple[str, Any]], initial_sub: str, init
     
     question_label = QLabel("Texto de pergunta")
     question_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-    question_label.setStyleSheet("background-color: rgba(128, 128, 128, 200); padding: 20px; font-size: 24px; color: black;")
+    question_label.setStyleSheet("background-color: rgba(128, 128, 128, 200); padding: 20px; font-size: 24px; color: black; max-height: 200px;")
     main_layout.addWidget(question_label)
     
     trapezoid_container = TrapezoidContainer()

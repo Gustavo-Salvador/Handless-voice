@@ -17,9 +17,9 @@ class IAConfigs(BaseModel):
     nivel_pensamento: NivelPensamento = NivelPensamento.MEDIO
     verbose: bool = False
 
-    max_tokens: int | None = 65536
-    top_p: float = 0.85
-    top_k: float = 40
+    max_tokens: int | None = 12000
+    top_p: float = 0.5
+    top_k: int = 5
     temperatura: float = 1
     semente: int | None = None
 

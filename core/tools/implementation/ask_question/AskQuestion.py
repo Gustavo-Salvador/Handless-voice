@@ -20,8 +20,8 @@ class AskQuestion(AbstractTool[[str], Path]):
 
     @property
     def description(self) -> str:
-        return ("Asks a question to the user and waits for their response."
-                "This should be used if you not sure about the user intention, "
+        return ("Asks a question to the user and waits for their response. This should be absolutely used in "
+                "ANY situation that you not sure about the user intention or if a situation is ambiguous "
                 "or if the user didn't ask anything.")
 
     @property

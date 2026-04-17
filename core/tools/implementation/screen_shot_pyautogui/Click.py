@@ -31,7 +31,8 @@ class Click(AbstractTool[[str], str]):
 
     @property
     def description(self) -> str:
-        return "Performs a single mouse click at the current mouse position using the specified button."
+        return ("Performs a single mouse click at the current mouse position using the specified button. "
+                "Make sure of where are you cliking using the 'subdivide_screen_shot' tool BEFORE using this tool.")
 
     @property
     def parameters(self) -> type[BaseModel]:

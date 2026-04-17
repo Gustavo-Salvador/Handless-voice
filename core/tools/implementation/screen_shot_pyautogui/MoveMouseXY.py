@@ -35,9 +35,8 @@ class MoveMouseXY(AbstractTool[[int, int], str]):
 
         return (
             "Moves the mouse exactly to the center of the specified grid cell (x, y). "
-            "You must use the coordinates observed from the most recent 'screen_shot' or "
-            "'subdivide_screen_shot' execution. "
-            f"The limit of the grid is x: {info_container.grid_size[0]} and y: {info_container.grid_size[1]}"
+            "You must use the coordinates observed from the most recent 'subdivide_screen_shot'. Use this FIRST before clicking."
+            f"The limit of the grid is x: {info_container.grid_size[0] - 1} and y: {info_container.grid_size[1] - 1}"
         )
 
     @property
@@ -48,7 +47,12 @@ class MoveMouseXY(AbstractTool[[int, int], str]):
         info_container = InfoContainer()
         
         if info_container.last_screenshot is None:
-            return "Error: No screenshot found to calculate coordinates. Please take a screenshot first."
+            print('Error: No screenshot found to calculate coordinates')
+            return "Error: No screenshot found to calculate coordinates. Please take a screenshot using 'screen_shot' first."
+
+        if len(info_container.sub_divided_list) == 0:
+            print('Error: No subdivision information found')
+            return "Error: No subdivision information found. Please subdivide the screenshot using 'subdivide_screen_shot' first."
 
         self.user_interface.set_sub_text('Movendo mouse...')
         self.user_interface.set_main_text(f'x: {x_index}, y: {y_index}')
@@ -74,6 +78,8 @@ class MoveMouseXY(AbstractTool[[int, int], str]):
         center_y = int(current_y + (y_index * final_cell_h) + (final_cell_h / 2))
 
         pyautogui.moveTo(center_x, center_y)
+
+        info_container.clear()
 
         self.user_interface.set_main_text(self.old_main_text)
         self.user_interface.set_sub_text(self.old_sub_text)

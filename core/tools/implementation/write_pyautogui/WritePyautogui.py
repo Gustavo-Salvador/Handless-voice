@@ -12,14 +12,16 @@ from .parameters import parameters
 
 try:
     import pyautogui
+    import pyperclip
 
 except ImportError:
     # Informa o usuário sobre a falta de bibliotecas
     print("\033[91mErro:\033[0m Algumas bibliotecas não estão instaladas, tentando instalar.")
-    os.system(f"{sys.executable} -m pip install pyautogui")
+    os.system(f"{sys.executable} -m pip install pyautogui, pyperclip")
     print("Bibliotecas instaladas com sucesso.")
 
     import pyautogui
+    import pyperclip
 
 @register_tool('write')
 class WritePyautogui(AbstractTool[[str], str]):
@@ -45,7 +47,8 @@ class WritePyautogui(AbstractTool[[str], str]):
 
         time.sleep(1)
 
-        pyautogui.write(text)
+        pyperclip.copy(text)
+        pyautogui.hotkey('ctrl', 'v')
 
         self.user_interface.set_main_text(self.old_main_text)
         self.user_interface.set_sub_text(self.old_sub_text)

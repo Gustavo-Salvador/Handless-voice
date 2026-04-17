@@ -14,14 +14,16 @@ from core.tools.register_tool import register_tool
 
 try:
     import pyautogui
+    from PIL import Image
 
 except ImportError:
     # Informa o usuário sobre a falta de bibliotecas
     print("\033[91mErro:\033[0m Algumas bibliotecas não estão instaladas, tentando instalar.")
-    os.system(f"{sys.executable} -m pip install pyautogui")
+    os.system(f"{sys.executable} -m pip install pyautogui, pillow")
     print("Bibliotecas instaladas com sucesso.")
 
     import pyautogui
+    from PIL import Image
 
 @register_tool('screen_shot')
 class ScreenShotPyautogui(AbstractTool[[], Path]):
@@ -57,6 +59,15 @@ class ScreenShotPyautogui(AbstractTool[[], Path]):
 
         screenshot = pyautogui.screenshot(file_path)
 
+        local_dir = Path(__file__).parent.resolve()
+
+        x, y = pyautogui.position()
+        cursor = Image.open(f'{local_dir}/assets/mouse.png').convert('RGBA')
+
+        cursor = cursor.resize((32, 32))
+
+        screenshot.paste(cursor, (x, y), cursor)
+
         info_container = InfoContainer()
         info_container.update(screenshot.copy(), file_path)
 
@@ -67,6 +78,7 @@ class ScreenShotPyautogui(AbstractTool[[], Path]):
         screenshot = screenshot.resize((int(screenshot.width // 2), int(screenshot.height // 2)))
 
         drawned_path_name = generate_file_name('drawned')
+
         drawned_path = Path(drawned_path_name)
         screenshot.save(drawned_path)
 
